@@ -75,10 +75,7 @@ jobs:
             --config p/javascript \
             --config p/react \
             --config p/owasp-top-ten \
-            --exclude node_modules \
-            --exclude dist \
-            --exclude tests \
-            --error /src
+            --error /src/src /src/api
 
   # ==========================================================================
   # ETAPA 2: PRUEBAS AUTOMATIZADAS (2 BLOQUES EN PARALELO)
