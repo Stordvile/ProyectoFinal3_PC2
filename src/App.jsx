@@ -5,6 +5,7 @@ import { ROLES_USUARIO } from './lib/domain.js';
 import { supabase } from './lib/supabaseClient.js';
 import AuthPanel from './components/AuthPanel.jsx';
 import Ep1Registro from './modules/Ep1Registro.jsx';
+import Ep2Servicios from './modules/Ep2Servicios.jsx';
 
 const TABS = [
   { id: 'ep1', label: 'EP-1 Registro y Protección', icon: ShieldCheck },
@@ -22,6 +23,7 @@ export default function App() {
   const [zonas, setZonas] = useState([]);
   const [operarios, setOperarios] = useState([]);
   const [alertas, setAlertas] = useState([]);
+  const [servicios, setServicios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [globalError, setGlobalError] = useState(null);
 
@@ -29,14 +31,16 @@ export default function App() {
     setLoading(true);
     setGlobalError(null);
     try {
-      const [zRes, oRes, aRes] = await Promise.all([
+      const [zRes, oRes, aRes, sRes] = await Promise.all([
         apiRequest('/api/zonas'),
         apiRequest('/api/operarios'),
-        apiRequest('/api/alertas-menores')
+        apiRequest('/api/alertas-menores'),
+        apiRequest('/api/servicios')
       ]);
       setZonas(zRes.data || []);
       setOperarios(oRes.data || []);
       setAlertas(aRes.data || []);
+      setServicios(sRes.data || []);
     } catch (err) {
       setGlobalError(err.message || 'No se pudieron cargar los datos del servidor.');
     } finally {
@@ -138,7 +142,16 @@ export default function App() {
           />
         )}
 
-        {activeTab !== 'ep1' && (
+        {activeTab === 'ep2' && (
+          <Ep2Servicios
+            zonas={zonas}
+            operarios={operarios}
+            servicios={servicios}
+            onRefresh={cargarDatos}
+          />
+        )}
+
+        {(activeTab === 'ep3' || activeTab === 'ep4') && (
           <div className="card">
             <h3>Módulo en construcción</h3>
             <p className="meta-text">Este módulo se integrará en los siguientes commits de la rama test.</p>
