@@ -6,6 +6,7 @@ import { supabase } from './lib/supabaseClient.js';
 import AuthPanel from './components/AuthPanel.jsx';
 import Ep1Registro from './modules/Ep1Registro.jsx';
 import Ep2Servicios from './modules/Ep2Servicios.jsx';
+import Ep3Pagos from './modules/Ep3Pagos.jsx';
 
 const TABS = [
   { id: 'ep1', label: 'EP-1 Registro y Protección', icon: ShieldCheck },
@@ -24,6 +25,7 @@ export default function App() {
   const [operarios, setOperarios] = useState([]);
   const [alertas, setAlertas] = useState([]);
   const [servicios, setServicios] = useState([]);
+  const [transacciones, setTransacciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [globalError, setGlobalError] = useState(null);
 
@@ -31,16 +33,18 @@ export default function App() {
     setLoading(true);
     setGlobalError(null);
     try {
-      const [zRes, oRes, aRes, sRes] = await Promise.all([
+      const [zRes, oRes, aRes, sRes, pRes] = await Promise.all([
         apiRequest('/api/zonas'),
         apiRequest('/api/operarios'),
         apiRequest('/api/alertas-menores'),
-        apiRequest('/api/servicios')
+        apiRequest('/api/servicios'),
+        apiRequest('/api/pagos')
       ]);
       setZonas(zRes.data || []);
       setOperarios(oRes.data || []);
       setAlertas(aRes.data || []);
       setServicios(sRes.data || []);
+      setTransacciones(pRes.data || []);
     } catch (err) {
       setGlobalError(err.message || 'No se pudieron cargar los datos del servidor.');
     } finally {
@@ -151,10 +155,19 @@ export default function App() {
           />
         )}
 
-        {(activeTab === 'ep3' || activeTab === 'ep4') && (
+        {activeTab === 'ep3' && (
+          <Ep3Pagos
+            operarios={operarios}
+            servicios={servicios}
+            transacciones={transacciones}
+            onRefresh={cargarDatos}
+          />
+        )}
+
+        {activeTab === 'ep4' && (
           <div className="card">
             <h3>Módulo en construcción</h3>
-            <p className="meta-text">Este módulo se integrará en los siguientes commits de la rama test.</p>
+            <p className="meta-text">Este módulo se integrará en el siguiente commit de la rama test.</p>
           </div>
         )}
       </main>
