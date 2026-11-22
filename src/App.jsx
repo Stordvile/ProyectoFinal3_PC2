@@ -7,6 +7,7 @@ import AuthPanel from './components/AuthPanel.jsx';
 import Ep1Registro from './modules/Ep1Registro.jsx';
 import Ep2Servicios from './modules/Ep2Servicios.jsx';
 import Ep3Pagos from './modules/Ep3Pagos.jsx';
+import Ep4Impacto from './modules/Ep4Impacto.jsx';
 
 const TABS = [
   { id: 'ep1', label: 'EP-1 Registro y Protección', icon: ShieldCheck },
@@ -26,6 +27,7 @@ export default function App() {
   const [alertas, setAlertas] = useState([]);
   const [servicios, setServicios] = useState([]);
   const [transacciones, setTransacciones] = useState([]);
+  const [impacto, setImpacto] = useState(null);
   const [loading, setLoading] = useState(true);
   const [globalError, setGlobalError] = useState(null);
 
@@ -33,18 +35,20 @@ export default function App() {
     setLoading(true);
     setGlobalError(null);
     try {
-      const [zRes, oRes, aRes, sRes, pRes] = await Promise.all([
+      const [zRes, oRes, aRes, sRes, pRes, iRes] = await Promise.all([
         apiRequest('/api/zonas'),
         apiRequest('/api/operarios'),
         apiRequest('/api/alertas-menores'),
         apiRequest('/api/servicios'),
-        apiRequest('/api/pagos')
+        apiRequest('/api/pagos'),
+        apiRequest('/api/impacto')
       ]);
       setZonas(zRes.data || []);
       setOperarios(oRes.data || []);
       setAlertas(aRes.data || []);
       setServicios(sRes.data || []);
       setTransacciones(pRes.data || []);
+      setImpacto(iRes.data || null);
     } catch (err) {
       setGlobalError(err.message || 'No se pudieron cargar los datos del servidor.');
     } finally {
@@ -165,10 +169,13 @@ export default function App() {
         )}
 
         {activeTab === 'ep4' && (
-          <div className="card">
-            <h3>Módulo en construcción</h3>
-            <p className="meta-text">Este módulo se integrará en el siguiente commit de la rama test.</p>
-          </div>
+          <Ep4Impacto
+            zonas={zonas}
+            operarios={operarios}
+            alertas={alertas}
+            impacto={impacto}
+            onRefresh={cargarDatos}
+          />
         )}
       </main>
 
