@@ -168,7 +168,9 @@ export function generarCodigoConstancia(operarioId = 'OP', fecha = new Date()) {
   const mm = String(fecha.getMonth() + 1).padStart(2, '0');
   const dd = String(fecha.getDate()).padStart(2, '0');
   const prefijo = String(operarioId).replace(/[^a-zA-Z0-9]/g, '').slice(0, 6).toUpperCase() || 'OP0000';
-  const sufijo = Math.floor(100000 + Math.random() * 900000);
+  const buf = new Uint32Array(1);
+  globalThis.crypto.getRandomValues(buf);
+  const sufijo = 100000 + (buf[0] % 900000);
   return `LS-${yyyy}${mm}${dd}-${prefijo}-${sufijo}`;
 }
 
